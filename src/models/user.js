@@ -1,4 +1,6 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, ENUM} = require('sequelize');
+const { Gender } = require('../enums/userEnums');
+const hashPassword = require('../utils/hashPassword')
 
 module.exports = (sequelize) => {
     const User = sequelize.define('User', {
@@ -9,12 +11,14 @@ module.exports = (sequelize) => {
         },
         name: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: false,
+            maxLength: 255
         },
         email: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: true
+            unique: true,
+            maxLength: 255
         },
         password: {
             type: DataTypes.STRING,
@@ -23,30 +27,44 @@ module.exports = (sequelize) => {
         google_sub: {
             type: DataTypes.STRING,
             allowNull: true,
-            unique: true
+            unique: true,
+            maxLength: 255
         },
         username: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: true
+            unique: true,
+            maxLength: 255
         },
         dob: {
             type: DataTypes.DATE,
             allowNull: false
         },
-        createdAt: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: DataTypes.NOW
+        gender: {
+            type: ENUM(Gender.MALE, Gender.FEMALE, Gender.NOT_SPECIFIED),
+            defaultValue: Gender.NOT_SPECIFIED,
+            allowNull: false
         },
-        updatedAt: {
-            type: DataTypes.DATE,
-            allowNull: false,
-            defaultValue: DataTypes.NOW
+        avatarUrl: {
+            type: DataTypes.STRING,
+            allowNull: true
         }
     }, {
         tableName: 'users',
-        underscored: true
+        underscored: true,
+        timestamps: true,
+        hooks: {
+            beforeCreate: async (user) => {
+                if (user.password) {
+                    user.password = await hashPassword(user.password)
+                }
+            },
+            beforeUpdate: async (user) => {
+                if (user.password) {
+                    user.password = await hashPassword(user.password)
+                }
+            }
+        }
     })
 
     return User
