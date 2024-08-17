@@ -12,7 +12,11 @@ dotenv.config();
 const connectionString = `mysql://${development.username}:${development.password}@` +
     `${development.host}:${development.port}/${development.database}`;
 
-const sequelize = new Sequelize(connectionString);
+const sequelize = new Sequelize(development.database, development.username, development.password, {
+    dialect:  development.dialect,
+    host: development.host,
+    port: development.port
+});
 
 fs
     .readdirSync(__dirname)
