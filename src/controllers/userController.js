@@ -2,6 +2,7 @@ const {User} = require('../models');
 const {ValidationError, UniqueConstraintError} = require('sequelize');
 const generateUsername = require('../utils/generateUsername');
 const {generateToken} = require("../utils/jwt");
+const {verifyPassword} = require("../utils/passwordHashing");
 
 
 const signup = async (req, res) => {
@@ -13,21 +14,21 @@ const signup = async (req, res) => {
 
         req.body.username = generateUsername(req.body.email);
 
-        const newUser = await User.create(req.body);
+        const user = await User.create(req.body);
 
         return res.status(201).json({
             user: {
-                id: newUser.id,
-                name: newUser.name,
-                email: newUser.email,
-                username: newUser.username,
-                dob: newUser.dob,
-                gender: newUser.gender,
-                avatarUrl: newUser.avatarUrl,
-                createdAt: newUser.createdAt,
-                updatedAt: newUser.updatedAt
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                username: user.username,
+                dob: user.dob,
+                gender: user.gender,
+                avatarUrl: user.avatarUrl,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
             },
-            token: generateToken(newUser)
+            token: generateToken(user)
         });
 
     } catch (error) {
@@ -45,4 +46,37 @@ const signup = async (req, res) => {
     }
 };
 
-module.exports = {signup};
+const signin = async (req, res) => {
+    try {
+        const user = await User.findOne({where: {email: req.body.email}});
+        if (!user) {
+            return res.status(400).json({message: 'User not found, please sign up!'});
+        }
+
+        const isPasswordValid = await verifyPassword(req.body.password, user.password);
+        if (!isPasswordValid) {
+            return res.status(400).json({message: 'Invalid credentials!'});
+        }
+
+        return res.status(201).json({
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                username: user.username,
+                dob: user.dob,
+                gender: user.gender,
+                avatarUrl: user.avatarUrl,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            },
+            token: generateToken(user)
+        });
+    } catch(error) {
+        return res.status(500).json({message: `An unknown error occurred: ${error}`});
+    }
+}
+
+
+
+module.exports = {signup, signin};

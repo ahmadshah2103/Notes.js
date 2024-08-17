@@ -61,7 +61,7 @@ This project is a Node.js application that uses Express.js for the backend. It i
 │   ├── services
 │   └── utils
 │       ├── generateUsername.js
-│       ├── hashPassword.js
+│       ├── passwordHashing.js
 │       └── jwt.js
 ├── template.js
 └── test

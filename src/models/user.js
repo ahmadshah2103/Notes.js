@@ -1,6 +1,6 @@
 const { DataTypes, ENUM} = require('sequelize');
 const { Gender } = require('../enums/userEnums');
-const hashPassword = require('../utils/hashPassword')
+const {hashPassword} = require('../utils/passwordHashing')
 
 module.exports = (sequelize) => {
     const User = sequelize.define('User', {
