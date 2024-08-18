@@ -24,7 +24,7 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: true
         },
-        google_sub: {
+        googleSub: {
             type: DataTypes.STRING,
             allowNull: true,
             unique: true,

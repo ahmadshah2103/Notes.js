@@ -2,8 +2,9 @@ const {User} = require('../models');
 const {ValidationError, UniqueConstraintError} = require('sequelize');
 const generateUsername = require('../utils/generateUsername');
 const {generateToken} = require("../utils/jwt");
+const { google } = require('googleapis');
 const {verifyPassword} = require("../utils/passwordHashing");
-
+const createOrUpdateUser = require('../utils/createOrUpdateUser');
 
 const signup = async (req, res) => {
     try {
@@ -77,6 +78,75 @@ const signin = async (req, res) => {
     }
 }
 
+const authenticateWithGoogle = async (req, res) => {
+    const {accessToken} = req.body;
 
+    try {
+        const oauth2Client = new google.auth.OAuth2();
 
-module.exports = {signup, signin};
+        oauth2Client.setCredentials({ access_token: accessToken });
+
+        const service = google.people({
+            version: 'v1',
+            auth: oauth2Client
+        });
+        const profile = await service.people.get({
+            resourceName: 'people/me',
+            personFields: 'photos,names,emailAddresses,birthdays,genders'
+        });
+
+        // return res.status(200).json(profile.data);
+
+        const googleSub = profile.data.resourceName.slice(7);
+        const photos = profile.data.photos || [];
+        const names = profile.data.names || [];
+        const emails = profile.data.emailAddresses || [];
+        const birthdays = profile.data.birthdays || [];
+        const genders = profile.data.genders || [];
+
+        if (!photos.length || !names.length || !emails.length || !birthdays.length || !genders.length || !googleSub) {
+            return res.status(400).json({ message: 'Missing required fields!' });
+        }
+
+        const avatarUrl = photos[0].url;
+        const name = names[0].displayName;
+        const email = emails[0].value;
+        const birthday = birthdays[0].date;
+        const gender = genders[0].value;
+
+        const dob = `${birthday.year}-${String(birthday.month).padStart(2, '0')}-${String(birthday.day).padStart(2, '0')}`;
+        const username = generateUsername(email);
+
+        const userData = {
+            name,
+            email,
+            password: null,
+            googleSub,
+            avatarUrl,
+            dob,
+            gender,
+            username,
+        };
+
+        const [ user, created ] = await createOrUpdateUser(userData);
+
+        return res.status(created ? 201 : 200).json({
+            user: {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                username: user.username,
+                dob: user.dob,
+                gender: user.gender,
+                avatarUrl: user.avatarUrl,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            },
+            token: generateToken(user)
+        });
+    } catch (error) {
+        return res.status(500).json({ message: `An unknown error occurred: ${error.message}` });
+    }
+};
+
+module.exports = {signup, signin, authenticateWithGoogle};
