@@ -1,26 +1,17 @@
 const express = require('express');
-const app = express();
 const cors = require('cors');
-const userRoutes = require('./src/routes/user')
-const db = require('./src/models');
+const userRoutes = require('./src/routes/user');
+const handleErrors = require("./src/middlewares/handleErrors");
+const initializeDatabase = require("./src/configs/database");
 
+const app = express();
 app.use(express.json());
 app.use(cors())
 
-db.sequelize.authenticate()
-    .then(() => {
-        console.log('Database connected and authenticated');
-        return db.sequelize.sync();
-    })
-    .then(() => {
-        console.log('Database synchronized');
-    })
-    .catch(err => {
-        console.error('Unable to connect to the database:', err);
-    });
-
+initializeDatabase().then(() => console.log('Database running ...'));
 
 app.use('/api/users', userRoutes)
+app.use(handleErrors);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
