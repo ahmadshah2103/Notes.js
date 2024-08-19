@@ -1,6 +1,7 @@
 const { DataTypes, ENUM} = require('sequelize');
 const { Gender } = require('../enums/userEnums');
 const {hashPassword} = require('../utils/passwordHashing')
+const Note = require('./note')
 
 module.exports = (sequelize) => {
     const User = sequelize.define('User', {
@@ -67,5 +68,12 @@ module.exports = (sequelize) => {
         }
     })
 
-    return User
+    User.associate = (models) => {
+        User.hasMany(models.Note, {
+            foreignKey: 'userId',
+            as: 'notes'
+        });
+    };
+
+    return User;
 }

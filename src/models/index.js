@@ -9,9 +9,6 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 
-const connectionString = `mysql://${development.username}:${development.password}@` +
-    `${development.host}:${development.port}/${development.database}`;
-
 const sequelize = new Sequelize(development.database, development.username, development.password, {
     dialect:  development.dialect,
     host: development.host,
