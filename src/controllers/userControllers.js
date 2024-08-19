@@ -1,12 +1,11 @@
 const {User} = require('../models');
-const {ValidationError, UniqueConstraintError} = require('sequelize');
 const generateUsername = require('../utils/generateUsername');
 const {generateToken} = require("../utils/jwt");
 const { google } = require('googleapis');
 const {verifyPassword} = require("../utils/passwordHashing");
 const createOrUpdateUser = require('../utils/createOrUpdateUser');
 
-const signup = async (req, res) => {
+const signup = async (req, res, next) => {
     try {
         const existingUser = await User.findOne({where: {email: req.body.email}});
         if (existingUser) {
@@ -33,21 +32,11 @@ const signup = async (req, res) => {
         });
 
     } catch (error) {
-        if (error instanceof ValidationError) {
-            const formattedErrors = {};
-            error.errors.forEach(err => {
-                formattedErrors[err.path] = err.message;
-            });
-            return res.status(400).json({message: formattedErrors});
-        } else if (error instanceof UniqueConstraintError) {
-            return res.status(400).json({message: error.message});
-        } else {
-            return res.status(500).json({message: `An unknown error occurred: ${error.message}`});
-        }
+        next(error);
     }
 };
 
-const signin = async (req, res) => {
+const signin = async (req, res, next) => {
     try {
         const user = await User.findOne({where: {email: req.body.email}});
         if (!user) {
@@ -74,11 +63,11 @@ const signin = async (req, res) => {
             token: generateToken(user)
         });
     } catch(error) {
-        return res.status(500).json({message: `An unknown error occurred: ${error}`});
+        next(error);
     }
 }
 
-const authenticateWithGoogle = async (req, res) => {
+const authenticateWithGoogle = async (req, res, next) => {
     const {accessToken} = req.body;
 
     try {
@@ -145,7 +134,7 @@ const authenticateWithGoogle = async (req, res) => {
             token: generateToken(user)
         });
     } catch (error) {
-        return res.status(500).json({ message: `An unknown error occurred: ${error.message}` });
+        next(error);
     }
 };
 
