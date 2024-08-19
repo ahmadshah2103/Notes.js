@@ -44,25 +44,33 @@ This project is a Node.js application that uses Express.js for the backend. It i
 ├── src
 │   ├── configs
 │   │   ├── config.js
-│   │   └── constants.js
+│   │   ├── constants.js
+│   │   └── database.js
 │   ├── controllers
-│   │   └── userController.js
+│   │   ├── noteControllers.js
+│   │   └── userControllers.js
 │   ├── enums
 │   │   └── userEnums.js
 │   ├── index.js
 │   ├── middlewares
-│   │   └── validateSignup.js
+│   │   ├── authenticate.js
+│   │   ├── handleErrors.js
+│   │   ├── validateAuthentication.js
+│   │   └── validateNotes.js
 │   ├── migrations
 │   ├── models
 │   │   ├── index.js
+│   │   ├── note.js
 │   │   └── user.js
 │   ├── routes
-│   │   └── user.js
+│   │   ├── noteRoutes.js
+│   │   └── userRoutes.js
 │   ├── services
 │   └── utils
+│       ├── createOrUpdateUser.js
 │       ├── generateUsername.js
-│       ├── passwordHashing.js
-│       └── jwt.js
+│       ├── jwt.js
+│       └── passwordHashing.js
 ├── template.js
 └── test
     ├── integration
