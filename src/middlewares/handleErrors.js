@@ -21,10 +21,11 @@ const handleErrors = (err, req, res, next) => {
         return res.status(401).json({ message: 'Invalid access token. The provided token is invalid or expired.' });
     }
 
-    // Handle other specific errors here
+    if (err.name === 'SequelizeDatabaseError') {
+        return res.status(400).json({ message: `Database error!}` });
+    }
 
-    // Generic error handler
-    return res.status(500).json({ message: 'Internal server error' });
+    return res.status(500).json({ message: 'An unknown error occurred!' });
 };
 
 module.exports = handleErrors;
