@@ -11,7 +11,7 @@ const validateSignup = (req, res, next) => {
 
     const { error } = signupSchema.validate(req.body);
     if (error) {
-        return res.status(400).json({ message: error.details[0].message });
+        next(error)
     }
     next();
 }
@@ -24,7 +24,7 @@ const validateSignin = (req, res, next) => {
 
     const { error } = signinSchema.validate(req.body);
     if (error) {
-        return res.status(400).json({ message: error.details[0].message });
+        next(error)
     }
     next();
 }
@@ -36,7 +36,7 @@ const validateAuthenticateWithGoogle = (req, res, next) => {
 
     const { error } = authenticateWithGoogleSchema.validate(req.body);
     if (error) {
-        return res.status(400).json({ message: error.details[0].message });
+        next(error)
     }
     next();
 }

@@ -3,11 +3,12 @@ const router = express.Router();
 const noteController = require('../controllers/noteControllers');
 const {authenticate} = require("../middlewares/authenticate");
 const {validateCreateNotes, validateUpdateNotes} = require("../middlewares/validateNotes");
+const asyncErrorHandler = require("../utils/asyncErrorHandler");
 
-router.post('/:id/notes', authenticate, validateCreateNotes, noteController.createNote)
-router.get('/:userId/notes', authenticate, noteController.getNotes)
-router.get('/:userId/notes/:noteId', authenticate, noteController.getNote)
-router.put('/:userId/notes/:noteId', authenticate, validateUpdateNotes, noteController.updateNote)
-router.delete('/:userId/notes/:noteId', authenticate, noteController.deleteNote)
+router.post('/:userId/notes', authenticate, validateCreateNotes, asyncErrorHandler(noteController.createNote))
+router.get('/:userId/notes', authenticate, asyncErrorHandler(noteController.getNotes))
+router.get('/:userId/notes/:noteId', authenticate, asyncErrorHandler(noteController.getNote))
+router.put('/:userId/notes/:noteId', authenticate, validateUpdateNotes, asyncErrorHandler(noteController.updateNote))
+router.delete('/:userId/notes/:noteId', authenticate, asyncErrorHandler(noteController.deleteNote))
 
 module.exports = router;
