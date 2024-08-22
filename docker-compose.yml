@@ -1,0 +1,27 @@
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: 1admin!+user1
+      MYSQL_DATABASE: notes
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 1admin!+user1
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_USER: root
+      DB_PASSWORD: 1admin!+user1
+      DB_NAME: notes
+
+volumes:
+  db_data:
