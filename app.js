@@ -14,7 +14,7 @@ app.use(cors())
 initializeDatabase().then(() => console.log('Database running ...'));
 
 app.use('/api/users', userRoutes);
-app.use('/api/notes', noteRoutes);
+app.use('/api/users/', noteRoutes);
 
 app.use(logErrors);
 app.use(handleErrors);

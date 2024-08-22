@@ -22,6 +22,9 @@ services:
       DB_USER: root
       DB_PASSWORD: 1admin!+user1
       DB_NAME: notes
+    volumes:
+      - ./logs:/app/logs
 
 volumes:
   db_data:
+  logs:
