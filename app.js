@@ -11,7 +11,9 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors())
 
-initializeDatabase().then(() => console.log('Database running ...'));
+initializeDatabase()
+  .then(() => console.log('Database connected!s'))
+  .catch(err => console.error('Failed to connect to Database:', err));
 
 app.use('/api/users', userRoutes);
 app.use('/api/users/', noteRoutes);

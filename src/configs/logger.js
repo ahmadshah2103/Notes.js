@@ -12,7 +12,7 @@ const logger = createLogger({
   transports: [
     new transports.Console(),
     new transports.File({
-      filename: path.join("/app/logs", "error.log"),
+      filename: path.join(__dirname, "../../logs", "error.log"),
       level: "error",
     }),
   ],
