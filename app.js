@@ -6,6 +6,7 @@ const handleErrors = require("./src/middlewares/handleErrors");
 const logErrors = require("./src/middlewares/logErrors");
 const initializeDatabase = require("./src/configs/database");
 const bodyParser = require('body-parser');
+const { authRateLimiter, notesRateLimiter } = require('./src/controllers/rateLimiters');
 
 const app = express();
 app.use(bodyParser.json());
@@ -15,8 +16,8 @@ initializeDatabase()
   .then(() => console.log('Database connected!s'))
   .catch(err => console.error('Failed to connect to Database:', err));
 
-app.use('/api/users', userRoutes);
-app.use('/api/users/', noteRoutes);
+app.use('/api/users', authRateLimiter, userRoutes);
+app.use('/api/users/', notesRateLimiter, noteRoutes);
 
 app.use(logErrors);
 app.use(handleErrors);
